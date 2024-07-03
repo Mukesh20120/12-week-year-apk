@@ -7,26 +7,34 @@ const hp = height / 100;
 const wp = width / 100;
 
 
-const WeekIcon = ({fill}) => {
-    const daysOfWeek = [
-    {day: 'Mon', color: '#FF5733'},
-    {day: 'Tue', color: '#33FF57'},
-    {day: 'Wed', color: '#3357FF'},
-    {day: 'Thu', color: '#FF33A1'},
-    {day: 'Fri', color: '#33FFA1'},
-    {day: 'Sat', color: '#A133FF'},
-    {day: 'Sun', color: '#FFA133'},
-  ];
+const MonthIcon = ({fill=2}) => {
+  const monthsWithColors = [
+    { month: '1 Month', color: '#E57373' }, // Red
+    { month: '2 Month', color: '#FFB74D' }, // Orange
+    { month: '3 Month', color: '#FFF176' }, // Yellow
+    { month: '4 Month', color: '#81C784' }, // Green
+    { month: '5 Month', color: '#64B5F6' }, // Blue
+    { month: '6 Month', color: '#F06292' }, // Pink
+    { month: '7 Month', color: '#9575CD' }, // Purple
+    { month: '8 Month', color: '#BA68C8' }, // Lavender
+    { month: '9 Month', color: '#FFD54F' }, // Amber
+    { month: '10 Month', color: '#4FC3F7' }, // Sky Blue
+    { month: '11 Month', color: '#4DB6AC' }, // Teal
+    { month: '12 Month', color: '#AED581' }  // Lime
+];
+
  
   return (
     <View
       style={{
         display: 'flex',
+        flexWrap: 'wrap',
+        rowGap: 4,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
       }}>
-      {daysOfWeek.map((item, idx) => (
+      {monthsWithColors.map((item, idx) => (
         <View
           style={{
             marginHorizontal: 5,
@@ -48,7 +56,8 @@ const WeekIcon = ({fill}) => {
               fontWeight: fill > idx ? 'none' : 'bold',
               textDecorationLine: fill > idx ? 'line-through' : 'none',
             }}>
-            {item.day}
+            {/* {item.month} */}
+            {idx + 1}
           </Text>
         </View>
       ))}
@@ -56,4 +65,4 @@ const WeekIcon = ({fill}) => {
   );
 };
 
-export default React.memo(WeekIcon);
+export default React.memo(MonthIcon);
