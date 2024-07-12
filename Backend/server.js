@@ -10,6 +10,7 @@ const {
 
 //router
 const todoRouter = require("./routers/todoRouter");
+const yearRouter = require('./routers/yearRouter');
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 const port = 5000;
 
 app.use("/api/v1/todo", todoRouter);
+app.use("/api/v1/year", yearRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

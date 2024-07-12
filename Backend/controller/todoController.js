@@ -12,7 +12,7 @@ const createNewTodo = asyncWrapper(async(req,res)=>{
     const {task} = req.body;
     if(!task)
         throw new notFoundError("please provide require data");
-    const newTodo = await todoModel.create({task});
+    const newTodo = await todoModel.create(req.body);
     res.json({status: true,message: 'New todo created successfully',todo: newTodo});
 })
 const updateTodo = asyncWrapper(async(req,res)=>{
