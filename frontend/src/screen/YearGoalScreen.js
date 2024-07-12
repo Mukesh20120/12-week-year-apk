@@ -1,60 +1,53 @@
 import {Keyboard, View, Alert} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {Text, Button, TextInput} from 'react-native-paper';
-import {generateId, getWeekStartAndEnd,getDateInDDMMYY} from '../utils/generateFunctions';
-import WeekIcon from '../component/WeekIcon';
-import  AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  generateId,
+  getWeekStartAndEnd,
+  getDateInDDMMYY,
+} from '../utils/generateFunctions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderList from '../component/RenderList';
 import Slider from '@react-native-community/slider';
 import MonthIcon from '../component/MonthIcon';
+import ScreenWrapper from '../component/ScreenWrapper';
 
+const YearGoalScreen = ({route, navigation: {navigate}}) => {
+  const {startYear, endYear} = route.params;
+  const start = getDateInDDMMYY(new Date(startYear));
+  const end = getDateInDDMMYY(new Date(endYear));
 
-const YearGoalScreen = ({navigation: {navigate}}) => {
-
-  const getDayOfWeek = () => {
-    const currentDate = new Date();
-    return (currentDate.getDay() + 6) % 7;
-  };
-  const dayOfWeek = getDayOfWeek();
-
-  const {startOfWeek, endOfWeek} = getWeekStartAndEnd();
-  const start = getDateInDDMMYY(startOfWeek);
-  const end = getDateInDDMMYY(endOfWeek);
-
-  
   const [taskList, setTaskList] = useState([]);
   const [inputText, setInputText] = useState('');
   const [value, setValue] = useState(0);
   const [updateId, setUpdateId] = useState(null);
   const [showInputBox, setShowInputBox] = useState(false);
 
-
-  useEffect(()=>{
-    const getGoalData =async () => {
-      try{
-       const dataString = await AsyncStorage.getItem('weeklyGoal');
-       const res = dataString!==null?JSON.parse(dataString):[];
-       setTaskList(res);
-      }catch(error){
-        Alert.alert('Error',"Something went wrong");
+  useEffect(() => {
+    const getGoalData = async () => {
+      try {
+        const dataString = await AsyncStorage.getItem('weeklyGoal');
+        const res = dataString !== null ? JSON.parse(dataString) : [];
+        setTaskList(res);
+      } catch (error) {
+        Alert.alert('Error', 'Something went wrong');
       }
-    }
-     getGoalData();
-  },[]);
+    };
+    getGoalData();
+  }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     const setGoalData = async () => {
-      try{
+      try {
         const newData = JSON.stringify(taskList);
-       await AsyncStorage.removeItem('weeklyGoal');
-       await AsyncStorage.setItem('weeklyGoal', newData);
-      }catch(error){
-        Alert.alert('Error',"Something went wrong");
+        await AsyncStorage.removeItem('weeklyGoal');
+        await AsyncStorage.setItem('weeklyGoal', newData);
+      } catch (error) {
+        Alert.alert('Error', 'Something went wrong');
       }
-    }
-     setGoalData();
-  },[taskList]);
-
+    };
+    setGoalData();
+  }, [taskList]);
 
   // adding,updating, function
   const handleOnAddPress = useCallback(() => {
@@ -86,7 +79,7 @@ const YearGoalScreen = ({navigation: {navigate}}) => {
     newTaskList[idx].done = !newTaskList[idx].done;
     setTaskList(newTaskList);
   });
- //update function
+  //update function
   const handleOnUpdate = useCallback(({id, idx}) => {
     const taskObject = taskList[idx];
     setInputText(taskObject.task);
@@ -94,7 +87,7 @@ const YearGoalScreen = ({navigation: {navigate}}) => {
     setShowInputBox(true);
     setUpdateId(id);
   });
- //delete task on long press
+  //delete task on long press
   const handleLongPress = useCallback(({id, idx}) => {
     const deleteTask = taskList[idx];
     Alert.alert(
@@ -116,30 +109,34 @@ const YearGoalScreen = ({navigation: {navigate}}) => {
     );
   });
 
-
   return (
-    <View style={{height: '100%', display: 'flex',backgroundColor: 'white',marginHorizontal:5}}>
+    <ScreenWrapper>
       {/* header */}
       <View style={{marginVertical: 10}}>
         <Text variant="headlineMedium" style={{textAlign: 'center'}}>
-          This Year Goal 
+          This Year Goal
         </Text>
         <Text
           variant="titleMedium"
           style={{textAlign: 'center'}}>{`(${start}-${end}) week`}</Text>
       </View>
 
-     {/* days of week left */}
+      {/* days of week left */}
       <View style={{marginBottom: 10}}>
         <MonthIcon />
       </View>
-      
-     {/* week review button */}
-     <View style={{marginHorizontal: 10,marginBottom: 10}}>
-      <Button mode="contained-tonal" onPress={()=>{navigate('allMonths')}} style={{elevation: 2}}>
-       Months Review
-      </Button>
-     </View>
+
+      {/* week review button */}
+      <View style={{marginHorizontal: 10, marginBottom: 10}}>
+        <Button
+          mode="contained-tonal"
+          onPress={() => {
+            navigate('allMonths', {startMonth: startYear});
+          }}
+          style={{elevation: 2}}>
+          Months Review
+        </Button>
+      </View>
 
       {/* input box and add button */}
       <View style={{marginHorizontal: 10}}>
@@ -178,9 +175,8 @@ const YearGoalScreen = ({navigation: {navigate}}) => {
           mode="contained"
           style={{elevation: 2}}
           onPress={() => {
-          if(showInputBox)
-            handleOnAddPress();
-          setShowInputBox(prev=>!prev);
+            if (showInputBox) handleOnAddPress();
+            setShowInputBox(prev => !prev);
           }}>
           Add Task
         </Button>
@@ -195,7 +191,7 @@ const YearGoalScreen = ({navigation: {navigate}}) => {
           handleDelete={handleLongPress}
         />
       </View>
-    </View>
+    </ScreenWrapper>
   );
 };
 

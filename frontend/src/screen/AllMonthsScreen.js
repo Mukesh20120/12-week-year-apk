@@ -5,9 +5,10 @@ import {
   generate12Weeks,
 } from '../utils/generateFunctions';
 
-const AllMonthsScreen = ({navigation: {navigate}}) => {
-  const startWeekDate = '2024-04-29';
-  const allMonthsData =  generate12Weeks(startWeekDate);
+const AllMonthsScreen = ({route,navigation: {navigate}}) => {
+  const {startMonth='2024-04-29'} = route.params
+  // const startWeekDate = '2024-04-29';
+  const allMonthsData =  generate12Weeks(startMonth);
   const start = allMonthsData[0].formatStartDate;
   const end = allMonthsData[11].formatEndDate;
 
