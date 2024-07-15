@@ -2,9 +2,8 @@ const {
   getYearList,
   createNewYearlyGoal,
   getAllYearlyGoal,
-  updateGoal,
-  deleteGoal,
 } = require("../controller/yearController");
+const {updateGoal,deleteGoal} = require('../controller/goalController')
 
 const Router = require("express").Router();
 

@@ -21,12 +21,12 @@ const colors = [
   "#4DD0E1", // Aqua
 ];
 
- function generateId() {
+function generateId() {
   const newId =
     Math.random().toString(36).substring(2, 9) + Date.now().toString();
   return newId;
 }
- function getDateInDDMMYY(currentDate) {
+function getDateInDDMMYY(currentDate) {
   const day = currentDate.getDate().toString().padStart(2, "0");
   const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
   const year = currentDate.getFullYear().toString();
@@ -34,7 +34,7 @@ const colors = [
   const dateInDdmmyy = `${day}-${month}-${year}`;
   return dateInDdmmyy;
 }
- function getWeekStartAndEnd() {
+function getWeekStartAndEnd() {
   const currentDate = new Date();
   const dayOfMonth = currentDate.getDate();
   const dayOfWeek = currentDate.getDay();
@@ -50,18 +50,27 @@ const colors = [
     endOfWeek,
   };
 }
- function getDatesBetween(startDate, endDate) {
+function getDatesBetween(startDate, endDate) {
   const dates = [];
-  const currentDate = startDate;
-
-  while (currentDate <= endDate) {
+  let currentDate = new Date(startDate);
+  let idx = 0;
+  while (currentDate <= new Date(endDate)) {
     const dateInDdmmyy = getDateInDDMMYY(currentDate);
-    dates.push(dateInDdmmyy);
+    const dayName = currentDate.toLocaleDateString("en-US", {
+      weekday: "short",
+    });
+    dates.push({
+      blockNumber: idx + 1,
+      date: currentDate,
+      formatDate: dateInDdmmyy,
+      day: dayName,
+      color: colors[idx++],
+    });
     currentDate.setDate(currentDate.getDate() + 1);
   }
   return dates;
 }
- function getAllYear() {
+function getAllYear() {
   const currentYear = new Date().getFullYear();
   let startDate = new Date(currentYear, 0, 1); // January 1st of the current year
   const result = [];
@@ -88,8 +97,8 @@ const colors = [
     breakWeekEnd.setDate(breakWeekEnd.getDate() + 6); // One week later
 
     result.push({
-      yearNumber: i + 1,
-      type: 'year',
+      blockNumber: i + 1,
+      type: "year",
       startDate: setStart,
       endDate: setEnd,
       formatStartDate: getDateInDDMMYY(setStart),
@@ -98,8 +107,8 @@ const colors = [
     });
 
     result.push({
-      yearNumber: 0,
-      type: 'break',
+      blockNumber: 0,
+      type: "break",
       startDate: breakWeekStart,
       endDate: breakWeekEnd,
       formatStartDate: getDateInDDMMYY(breakWeekStart),
@@ -114,7 +123,7 @@ const colors = [
 
   return result;
 }
- function generate12Weeks(start) {
+function generate12Weeks(start) {
   const current = new Date(start);
   const result = [];
   // Adjust start date to the nearest preceding Monday
@@ -129,7 +138,8 @@ const colors = [
     current.setDate(current.getDate() + 6); // Move to the end of the week
 
     result.push({
-      month: `${i + 1} Month`,
+      blockNumber: i + 1,
+      type: "month",
       startWeek: newStart,
       endWeek: current,
       formatStartDate: getDateInDDMMYY(newStart),

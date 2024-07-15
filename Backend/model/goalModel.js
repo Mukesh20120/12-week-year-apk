@@ -11,6 +11,12 @@ const goalSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    value: {
+      type: Number,
+      min: [0,'minimum value can be at least 0'],
+      max: [10,'maximum value can be at most 10'],
+      default: 0
+    },
     yearId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'yearsInYear'

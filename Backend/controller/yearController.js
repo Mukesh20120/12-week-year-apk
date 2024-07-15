@@ -16,13 +16,14 @@ const getYearList = asyncWrapper(async (req, res) => {
 
   const yearsCountInYear = await YearModel.countDocuments({
     year: extractedYear,
+    $or: [{type: 'year',type: 'break'}]
   });
 
   if (yearsCountInYear === 0) {
     // If not found, generate the 4 blocks of 12 weeks
     const newYearData = getAllYear(extractedYear).map((singleYearBlock) => {
       const {
-        yearNumber,
+        blockNumber,
         type,
         startDate,
         endDate,
@@ -31,7 +32,7 @@ const getYearList = asyncWrapper(async (req, res) => {
         color,
       } = singleYearBlock;
       return {
-        yearNumber,
+        blockNumber,
         type,
         year: extractedYear,
         startDate,
@@ -39,23 +40,25 @@ const getYearList = asyncWrapper(async (req, res) => {
         formatStartDate,
         formatEndDate,
         color,
-        goal: [],
       };
     });
 
     await YearModel.insertMany(newYearData);
   }
-  const allYearInYear = await YearModel.find({ year: extractedYear });
+  const allYearInYear = await YearModel.find({ year: extractedYear,$or: [
+    { type: 'year' },
+    { type: 'break' }
+  ]}).sort('startDate');
   // Send the data back to the user
   res.status(200).json({ success: true, data: allYearInYear });
 });
 
 const createNewYearlyGoal = asyncWrapper(async(req,res)=>{
-  const {yearId,task} = req.body;
+  const {yearId,task,value} = req.body;
   if(!yearId || !mongoose.isValidObjectId(yearId)){
     throw new Error('Year Id Not found')
   }
-  const newGoal = await GoalModel.create({yearId,task});
+  const newGoal = await GoalModel.create({yearId,task,value});
   res.json({success: true,message: 'New goal created Successfully',newGoal});
 })
 const getAllYearlyGoal = asyncWrapper(async(req,res)=>{
@@ -63,38 +66,16 @@ const getAllYearlyGoal = asyncWrapper(async(req,res)=>{
   if(!yearId || !mongoose.isValidObjectId(yearId)){
     throw new Error('Year Id Not found')
   }
-  const allGoal = await GoalModel.find({yearId});
-  res.json({success: true,message: 'New goal created Successfully',allGoal});
+  const allGoal = await GoalModel.find({
+    yearId: { $eq: yearId, $exists: true },
+    monthId: { $exists: false }
+  }).sort({value: -1});
+  res.json({success: true,message: 'list of goal fetch Successfully',allGoal});
 })
 
-const updateGoal = asyncWrapper(async(req,res)=>{
-  const {goalId,task,done} = req.body;
-  if(!goalId || !mongoose.isValidObjectId(goalId)){
-    throw new Error('Goal Id is invalid');
-  }
-  let updateGoadData = {};
-  if(task){
-    updateGoadData['task']=task;
-  }
-  if(done!==undefined){
-    updateGoadData['done']=done;
-  }
-  const newUpdatedGoal = await GoalModel.findByIdAndUpdate(goalId,updateGoadData,{new: true});
-  res.json({success: true,message: 'Goal updated Successfully',newUpdatedGoal});
-})
-const deleteGoal = asyncWrapper(async(req,res)=>{
-  const {goalId} = req.query;
-  if(!goalId || !mongoose.isValidObjectId(goalId)){
-    throw new Error('Goal Id is invalid')
-  }
-  await GoalModel.findByIdAndDelete(goalId);
-  res.json({success: true,message: 'Delete goal Successfully'});
-})
 
 module.exports = {
   getYearList,
   createNewYearlyGoal,
   getAllYearlyGoal,
-  updateGoal,
-  deleteGoal
 };
