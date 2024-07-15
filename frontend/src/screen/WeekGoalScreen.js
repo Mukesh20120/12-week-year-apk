@@ -6,106 +6,111 @@ import WeekIcon from '../component/WeekIcon';
 import  AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderList from '../component/RenderList';
 import Slider from '@react-native-community/slider';
+import { createMonthGoalApi, deleteMonthGoalApi, getMonthGoalApi, updateMonthGoalApi } from '../service/api';
+import InputBox from '../component/InputBox';
 
 
-const WeekGoalScreen = ({navigation: {navigate}}) => {
+const WeekGoalScreen = ({route,navigation: {navigate}}) => {
+  const {monthId,yearId,startMonth,endMonth} = route.params;
 
-  const getDayOfWeek = () => {
-    const currentDate = new Date();
-    return (currentDate.getDay() + 6) % 7;
-  };
-  const dayOfWeek = getDayOfWeek();
+  const dayOfWeek = 2;
 
-  const {startOfWeek, endOfWeek} = getWeekStartAndEnd();
-  const start = getDateInDDMMYY(startOfWeek);
-  const end = getDateInDDMMYY(endOfWeek);
+
+  const start = getDateInDDMMYY(new Date(startMonth));
+  const end = getDateInDDMMYY(new Date(endMonth));
 
   
   const [taskList, setTaskList] = useState([]);
-  const [inputText, setInputText] = useState('');
-  const [value, setValue] = useState(0);
-  const [updateId, setUpdateId] = useState(null);
   const [showInputBox, setShowInputBox] = useState(false);
+  const [updateId,setUpdateId] = useState(null);
+  const [text,setText] = useState('');
+  const [priority,setPriority] = useState(0);
 
-
-  useEffect(()=>{
-    const getGoalData =async () => {
-      try{
-       const dataString = await AsyncStorage.getItem('weeklyGoal');
-       const res = dataString!==null?JSON.parse(dataString):[];
-       setTaskList(res);
-      }catch(error){
-        Alert.alert('Error',"Something went wrong");
+  const getGoalData = async () => {
+    try {
+      const queryData = {
+        monthId,
+        yearId
       }
+      const res = await getMonthGoalApi({queryData});
+      setTaskList(res.data.allGoal);
+    } catch (error) {
+      Alert.alert('Error', 'Not able to fetch the year goal list');
+      setTaskList([]);
     }
-     getGoalData();
-  },[]);
-
-  useEffect(()=>{
-    const setGoalData = async () => {
-      try{
-        const newData = JSON.stringify(taskList);
-       await AsyncStorage.removeItem('weeklyGoal');
-       await AsyncStorage.setItem('weeklyGoal', newData);
-      }catch(error){
-        Alert.alert('Error',"Something went wrong");
+  };
+  useEffect(() => {
+    getGoalData();
+  }, []);
+  //handle adding in list
+  const handleOnAddPress = 
+    async (inputText, value) => {
+      if (inputText !== '') {
+        try {
+          if (updateId !== null) {
+            const newTask = {
+              goalId: updateId,
+              task: inputText,
+              value,
+            };
+            const res = await updateMonthGoalApi({updateData: newTask});
+          } else {
+            const newTask = {
+              yearId,
+              monthId,
+              task: inputText,
+              value,
+            };
+            const res = await createMonthGoalApi({newData: newTask});
+          }
+        } catch (error) {
+          Alert.alert('Error', error.message);
+        }
+        finally{
+          setUpdateId(null);
+          setText('');
+          setPriority(0);
+          getGoalData();
+        }
       }
-    }
-     setGoalData();
-  },[taskList]);
+    };
 
-
-  // adding,updating, function
-  const handleOnAddPress = useCallback(() => {
-    if (updateId !== null && inputText !== '') {
-      let newArray = taskList.map(item =>
-        item.id === updateId ? {...item, task: inputText, value} : item,
-      );
-      newArray.sort((a, b) => b.value - a.value);
-      setTaskList(newArray);
-      setUpdateId(null);
-    } else if (inputText !== '') {
-      const newTask = {
-        id: generateId(),
-        task: inputText,
-        value,
-        done: false,
-      };
-      let newArray = [...taskList, newTask];
-      newArray.sort((a, b) => b.value - a.value);
-      setTaskList(newArray);
-    }
-    setInputText('');
-    setValue(0);
-    Keyboard.dismiss();
-  });
   //check mark function
-  const handleCheckPressed = useCallback(({id, idx}) => {
-    let newTaskList = [...taskList];
-    newTaskList[idx].done = !newTaskList[idx].done;
-    setTaskList(newTaskList);
+  const handleCheckPressed = useCallback(async({id, done}) => {
+      try{
+       const newData = {
+        goalId: id,
+        done
+       }
+        await updateMonthGoalApi({updateData: newData});
+        getGoalData();
+      }catch(error){
+        Alert.alert('Error',error.message);
+      }
   });
- //update function
-  const handleOnUpdate = useCallback(({id, idx}) => {
-    const taskObject = taskList[idx];
-    setInputText(taskObject.task);
-    setValue(taskObject.value);
+  //update function
+  const handleOnUpdate = useCallback(({id, text, value}) => {
     setShowInputBox(true);
+    setText(text);
+    setPriority(value);
     setUpdateId(id);
   });
- //delete task on long press
-  const handleLongPress = useCallback(({id, idx}) => {
-    const deleteTask = taskList[idx];
+  //delete task on long press
+  const handleLongPress = useCallback(({id, txt, pri}) => {
     Alert.alert(
       'Alert',
-      `Do you want to delete task:- ${deleteTask.task} & carry value ${deleteTask.value} ?`,
+      `Do you want to delete task:-${txt} & carry value ${pri}`,
       [
         {text: 'cancel', style: 'cancel'},
         {
           text: 'ok',
-          onPress: () => {
-            const newArray = taskList.filter(item => item.id != id);
-            setTaskList(newArray);
+          onPress: async() => {
+            try{
+              await deleteMonthGoalApi({goalId: id});
+              getGoalData();
+            }catch(error){
+               Alert.alert('Error',error.message);
+            }
           },
         },
       ],
@@ -141,49 +146,13 @@ const WeekGoalScreen = ({navigation: {navigate}}) => {
      </View>
 
       {/* input box and add button */}
-      <View style={{marginHorizontal: 10}}>
-        {showInputBox && (
-          <>
-            <TextInput
-              mode="flat"
-              value={inputText}
-              placeholder="what will you do today"
-              onChangeText={text => setInputText(text)}
-              style={{elevation: 2, marginBottom: 5, fontSize: 22}}
-            />
-            <View
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}>
-              <Slider
-                style={{width: '90%', height: 40, marginBottom: 5}}
-                minimumValue={0}
-                maximumValue={10}
-                value={value}
-                step={1}
-                onValueChange={val => setValue(val)}
-                minimumTrackTintColor="#000"
-                maximumTrackTintColor="#808080"
-              />
-              <Text variant="headlineSmall">{value}</Text>
-            </View>
-          </>
-        )}
-
-        <Button
-          mode="contained"
-          style={{elevation: 2}}
-          onPress={() => {
-          if(showInputBox)
-            handleOnAddPress();
-          setShowInputBox(prev=>!prev);
-          }}>
-          Add Task
-        </Button>
-      </View>
+      <InputBox
+        handleOnAddPress={handleOnAddPress}
+        showInputBox={showInputBox}
+        toggleInputBox={setShowInputBox}
+        text={text}
+        priority={priority}
+      />
 
       {/* render the list */}
       <View>

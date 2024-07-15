@@ -1,16 +1,31 @@
-import React, {useMemo} from 'react';
-import {Dimensions, Pressable, ScrollView, View} from 'react-native';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Alert, Dimensions, Pressable, ScrollView, View} from 'react-native';
 import {Text} from 'react-native-paper';
 import {
   generate12Weeks,
 } from '../utils/generateFunctions';
+import { getAllMonthApi } from '../service/api';
 
 const AllMonthsScreen = ({route,navigation: {navigate}}) => {
-  const {startMonth='2024-04-29'} = route.params
-  // const startWeekDate = '2024-04-29';
-  const allMonthsData =  generate12Weeks(startMonth);
-  const start = allMonthsData[0].formatStartDate;
-  const end = allMonthsData[11].formatEndDate;
+  const [allMonthsData,setAllMonthsData] = useState([]);
+  const {startMonth='2024-04-29',yearId} = route.params
+  useEffect(()=>{
+    const fetchAllMonthData = async()=>{
+      try{
+        const queryData = {
+          startDate: startMonth,
+          yearId
+        }
+       const res = await getAllMonthApi({queryData});
+       setAllMonthsData(res.data.data);
+      }catch(error){
+        Alert.alert('Error',error.message);
+      }
+    }
+    fetchAllMonthData();
+  },[]);
+  const start = allMonthsData?.[0]?.formatStartDate??new Date();
+  const end = allMonthsData?.[11]?.formatEndDate ?? new Date();
 
   const {height} = Dimensions.get('window');
   const hp = height / 100;
@@ -35,7 +50,7 @@ const AllMonthsScreen = ({route,navigation: {navigate}}) => {
           This Year scores
         </Text>
       </View>
-
+      {/* <Text>{JSON.stringify(allMonthsData)}</Text> */}
       {/* all month of year */}
       <ScrollView>
         <View
@@ -44,10 +59,15 @@ const AllMonthsScreen = ({route,navigation: {navigate}}) => {
             flexWrap: 'wrap',
             flexDirection: 'row',
           }}>
-          {allMonthsData.map((item, index) => (
+          {allMonthsData && allMonthsData.map((item, index) => (
             <Pressable
               onPress={() => {
-                navigate('weeklyGoal');
+                navigate('weeklyGoal',{
+                  monthId: item._id,
+                  yearId: item.yearId,
+                  startMonth: item.startDate,
+                  endMonth: item.endDate,
+                });
               }}
               style={{
                 width: '45%',
@@ -61,7 +81,7 @@ const AllMonthsScreen = ({route,navigation: {navigate}}) => {
                 elevation: 2,
               }}
               key={index}>
-              <Text style={{fontSize: 22, fontWeight: 'bold'}}>{item.month}</Text>
+              <Text style={{fontSize: 22, fontWeight: 'bold'}}>{item.blockNumber}</Text>
               <Text style={{fontWeight: 'bold'}}>{item.formatStartDate}</Text>
               <Text style={{fontWeight: 'bold'}}>to</Text>
               <Text style={{fontWeight: 'bold'}}>{item.formatEndDate}</Text>

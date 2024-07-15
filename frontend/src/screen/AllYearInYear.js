@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {Dimensions, Pressable, ScrollView, View} from 'react-native';
+import {Alert, Dimensions, Pressable, ScrollView, View} from 'react-native';
 import {Text} from 'react-native-paper';
 import {generate12Weeks, getAllYear} from '../utils/generateFunctions';
 import ScreenWrapper from '../component/ScreenWrapper';
@@ -8,15 +8,13 @@ import { getAllYearApi } from '../service/api';
 
 const AllYearInYear = ({navigation: {navigate}}) => {
   const [allYears, setAllYears] = useState([]);
-  const [errMessage, setErrMessage] = useState();
-  const url = 'http://192.168.1.7:5000/api/v1/year';
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res =await getAllYearApi();
         setAllYears(res.data.data);
       } catch (error) {
-        setErrMessage(errMessage);
+        Alert.alert('Error',error.message);
       }
     };
     fetchData();
@@ -74,7 +72,7 @@ const AllYearInYear = ({navigation: {navigate}}) => {
               }}
               key={index}>
               <Text style={{fontSize: 22, fontWeight: 'bold'}}>
-                {item.yearNumber}
+                {item.blockNumber}
               </Text>
               <Text style={{fontWeight: 'bold'}}>{item.formatStartDate}</Text>
               <Text style={{fontWeight: 'bold'}}>to</Text>

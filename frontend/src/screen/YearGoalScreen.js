@@ -137,7 +137,7 @@ const YearGoalScreen = ({route, navigation: {navigate}}) => {
         <Button
           mode="contained-tonal"
           onPress={() => {
-            navigate('allMonths', {startMonth: startYear});
+            navigate('allMonths', {startMonth: startYear,yearId});
           }}
           style={{elevation: 2}}>
           Months Review
