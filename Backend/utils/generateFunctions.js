@@ -125,6 +125,7 @@ function getAllYear() {
 }
 function generate12Weeks(start) {
   const current = new Date(start);
+  const year = current.getFullYear();
   const result = [];
   // Adjust start date to the nearest preceding Monday
   let dayOfWeek = current.getDay();
@@ -140,8 +141,9 @@ function generate12Weeks(start) {
     result.push({
       blockNumber: i + 1,
       type: "month",
-      startWeek: newStart,
-      endWeek: current,
+      year,
+      startDate: newStart,
+      endDate: current,
       formatStartDate: getDateInDDMMYY(newStart),
       formatEndDate: getDateInDDMMYY(current),
       color: colors[i],

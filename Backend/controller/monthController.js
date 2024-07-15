@@ -3,20 +3,17 @@ const { generate12Weeks } = require("../utils/generateFunctions");
 const YearModel = require("../model/years");
 const GoalModel = require("../model/goalModel");
 const { isValidObjectId } = require("../utils/validateFunction");
-const pattern = /^\d+$/;
 
 const getMonthList = asyncWrapper(async (req, res) => {
-  let { startDate, inputYear } = req.query;
+  let { startDate, yearId } = req.query;
 
-  if (!inputYear || !pattern.test(inputYear)) {
-    inputYear = new Date().getFullYear();
+  if(!isValidObjectId(yearId)){
+    throw new Error('invalid yearId');
   }
 
-  const extractedYear = parseInt(inputYear, 10);
-
   const yearsCountInYear = await YearModel.countDocuments({
-    year: extractedYear,
     type: "month",
+    yearId
   });
 
   if (yearsCountInYear === 0) {
@@ -25,6 +22,7 @@ const getMonthList = asyncWrapper(async (req, res) => {
       const {
         blockNumber,
         type,
+        year,
         startDate,
         endDate,
         formatStartDate,
@@ -34,7 +32,8 @@ const getMonthList = asyncWrapper(async (req, res) => {
       return {
         blockNumber,
         type,
-        year: extractedYear,
+        year,
+        yearId,
         startDate,
         endDate,
         formatStartDate,
@@ -46,19 +45,19 @@ const getMonthList = asyncWrapper(async (req, res) => {
     await YearModel.insertMany(newMonthData);
   }
   const allMonthInYear = await YearModel.find({
-    year: extractedYear,
+    yearId,
     type: "month",
-  });
+  }).sort({blockNumber: 1});
   // Send the data back to the user
   res.status(200).json({ success: true, data: allMonthInYear });
 });
 
 const createNewMonthlyGoal = asyncWrapper(async (req, res) => {
-  const { yearId, monthId, task } = req.body;
+  const { yearId, monthId, task,value } = req.body;
   if (!isValidObjectId(yearId) || !isValidObjectId(monthId)) {
     throw new Error("Id Not valid");
   }
-  const newGoal = await GoalModel.create({ yearId, monthId, task });
+  const newGoal = await GoalModel.create({ yearId, monthId, task,value});
   res.json({
     success: true,
     message: "New goal created Successfully",
@@ -73,7 +72,7 @@ const getAllMonthlyGoal = asyncWrapper(async (req, res) => {
   const allGoal = await GoalModel.find({
     yearId: { $eq: yearId, $exists: true },
     monthId: { $eq: monthId, $exists: true }
-  });
+  }).sort({value: -1});
   res.json({
     success: true,
     message: "list of all goal fetch Successfully",
