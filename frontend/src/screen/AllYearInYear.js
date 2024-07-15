@@ -1,13 +1,28 @@
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Dimensions, Pressable, ScrollView, View} from 'react-native';
 import {Text} from 'react-native-paper';
 import {generate12Weeks, getAllYear} from '../utils/generateFunctions';
 import ScreenWrapper from '../component/ScreenWrapper';
+import axios from 'axios';
 
 const AllYearInYear = ({navigation: {navigate}}) => {
-  const allYears = getAllYear();
-  const start = allYears?allYears[0].formatStartDate:'00-00-0000';
-  const end = allYears?allYears[allYears.length - 1].formatEndDate:'00-00-0000';
+  const [allYears, setAllYears] = useState([]);
+  const [errMessage, setErrMessage] = useState();
+  const url = 'http://192.168.1.7:5000/api/v1/year';
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = (await axios.get(url)).data;
+        setAllYears(res.data);
+      } catch (error) {
+        setErrMessage(errMessage);
+      }
+    };
+    fetchData();
+  }, []);
+  // const allYears = getAllYear();
+  const start = allYears?.[0]?.formatStartDate ?? '00-00-0000';
+  const end = allYears?.[allYears.length - 1]?.formatEndDate ?? '00-00-0000';
   const current = new Date();
   const currentYear = current.getFullYear();
   const {height} = Dimensions.get('window');
@@ -27,7 +42,7 @@ const AllYearInYear = ({navigation: {navigate}}) => {
           This Year scores
         </Text>
       </View>
-
+      {/* <Text>{JSON.stringify(allYears)}</Text> */}
       {/* all month of year */}
       <ScrollView>
         <View
@@ -40,8 +55,9 @@ const AllYearInYear = ({navigation: {navigate}}) => {
             <Pressable
               onPress={() => {
                 navigate('yearlyGoal', {
-                  startYear: item.startYear.toISOString(),
-                  endYear: item.endYear.toISOString(),
+                  yearId: item._id,
+                  startYear: item.startDate,
+                  endYear: item.endDate,
                 });
               }}
               style={{
@@ -57,7 +73,7 @@ const AllYearInYear = ({navigation: {navigate}}) => {
               }}
               key={index}>
               <Text style={{fontSize: 22, fontWeight: 'bold'}}>
-                {item.year}
+                {item.yearNumber}
               </Text>
               <Text style={{fontWeight: 'bold'}}>{item.formatStartDate}</Text>
               <Text style={{fontWeight: 'bold'}}>to</Text>

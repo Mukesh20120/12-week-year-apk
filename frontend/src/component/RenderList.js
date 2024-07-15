@@ -17,14 +17,14 @@ const RenderList = React.memo(
         <TouchableOpacity
           style={{flex: 1}}
           onPress={() => {
-            handleCheckPressed({id: item.id, idx: index});
+            handleCheckPressed({id: item._id, done: !item.done});
           }}>
           <Checkbox status={item.done ? 'checked' : 'unchecked'} />
         </TouchableOpacity>
         <Pressable
           style={{flex: 8}}
           onLongPress={() => {
-            handleDelete({id: item.id, idx: index});
+            handleDelete({id: item._id, txt: item.task,pri: item.value});
           }}>
           <Text
             variant="titleLarge"
@@ -35,7 +35,7 @@ const RenderList = React.memo(
             {item.task}
           </Text>
           <ProgressBar
-            progress={item.value / 10}
+            progress={item?item.value / 10:0}
             color={item.done ? '#C8C8C8' : 'green'}
           />
         </Pressable>
@@ -43,7 +43,7 @@ const RenderList = React.memo(
           <TouchableOpacity
             onPress={() => {
               if (item.done === false)
-                handleOnUpdate({id: item.id, idx: index});
+                handleOnUpdate({id: item._id,text: item.task,value: item.value});
             }}>
             <MaterialCommunityIcons name="pencil" color="black" size={20} />
           </TouchableOpacity>
@@ -53,7 +53,7 @@ const RenderList = React.memo(
     return (
       <View style={{marginVertical: 20}}>
         <FlatList
-          keyExtractor={item => item.id}
+          keyExtractor={item => item._id}
           data={data}
           renderItem={renderItems}
         />
