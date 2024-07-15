@@ -4,6 +4,7 @@ import {Text} from 'react-native-paper';
 import {generate12Weeks, getAllYear} from '../utils/generateFunctions';
 import ScreenWrapper from '../component/ScreenWrapper';
 import axios from 'axios';
+import { getAllYearApi } from '../service/api';
 
 const AllYearInYear = ({navigation: {navigate}}) => {
   const [allYears, setAllYears] = useState([]);
@@ -12,8 +13,8 @@ const AllYearInYear = ({navigation: {navigate}}) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = (await axios.get(url)).data;
-        setAllYears(res.data);
+        const res =await getAllYearApi();
+        setAllYears(res.data.data);
       } catch (error) {
         setErrMessage(errMessage);
       }

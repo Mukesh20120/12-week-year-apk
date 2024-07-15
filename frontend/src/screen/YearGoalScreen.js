@@ -1,13 +1,13 @@
 import {Keyboard, View, Alert} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
-import {Text, Button, TextInput} from 'react-native-paper';
-import {generateId, getDateInDDMMYY} from '../utils/generateFunctions';
+import {Text, Button} from 'react-native-paper';
+import { getDateInDDMMYY} from '../utils/generateFunctions';
 import RenderList from '../component/RenderList';
-import Slider from '@react-native-community/slider';
 import MonthIcon from '../component/MonthIcon';
 import ScreenWrapper from '../component/ScreenWrapper';
 import axios from 'axios';
 import InputBox from '../component/InputBox';
+import { createYearGoalApi, deleteYearGoalApi, getYearGoalApi, updateYearGoalApi } from '../service/api';
 
 const YearGoalScreen = ({route, navigation: {navigate}}) => {
   const {
@@ -26,8 +26,7 @@ const YearGoalScreen = ({route, navigation: {navigate}}) => {
 
   const getGoalData = async () => {
     try {
-      const url = `http://192.168.1.7:5000/api/v1/year/goal?yearId=${yearId}`;
-      const res = await axios.get(url);
+      const res = await getYearGoalApi({yearId});
       setTaskList(res.data.allGoal);
     } catch (error) {
       Alert.alert('Error', 'Not able to fetch the year goal list');
@@ -40,7 +39,6 @@ const YearGoalScreen = ({route, navigation: {navigate}}) => {
   //handle adding in list
   const handleOnAddPress = 
     async (inputText, value) => {
-      const url = `http://192.168.1.7:5000/api/v1/year/goal`;
       if (inputText !== '') {
         try {
           if (updateId !== null) {
@@ -49,18 +47,16 @@ const YearGoalScreen = ({route, navigation: {navigate}}) => {
               task: inputText,
               value,
             };
-            console.log(newTask);
-            const res = await axios.put(url, newTask);
-            Alert.alert('success', res.data.message);
+            const res = await updateYearGoalApi({updateData: newTask});
+            // Alert.alert('success', res.data.message);
           } else {
             const newTask = {
               yearId,
               task: inputText,
               value,
             };
-            console.log({newTask})
-            const res = await axios.post(url, newTask);
-            Alert.alert('success', res.data.message);
+            const res = await createYearGoalApi({newData: newTask});
+            // Alert.alert('success', res.data.message);
           }
         } catch (error) {
           Alert.alert('Error', error.message);
@@ -77,8 +73,11 @@ const YearGoalScreen = ({route, navigation: {navigate}}) => {
   //check mark function
   const handleCheckPressed = useCallback(async({id, done}) => {
       try{
-       const url = `http://192.168.1.7:5000/api/v1/year/goal`;
-        await axios.put(url,{goalId: id, done});
+       const newData = {
+        goalId: id,
+        done
+       }
+        await updateYearGoalApi({updateData: newData});
         getGoalData();
       }catch(error){
         Alert.alert('Error',error.message);
@@ -101,9 +100,8 @@ const YearGoalScreen = ({route, navigation: {navigate}}) => {
         {
           text: 'ok',
           onPress: async() => {
-            const url = `http://192.168.1.7:5000/api/v1/year/goal?goalId=${id}`;
             try{
-              await axios.delete(url);
+              await deleteYearGoalApi({goalId: id});
               getGoalData();
             }catch(error){
                Alert.alert('Error',error.message);
