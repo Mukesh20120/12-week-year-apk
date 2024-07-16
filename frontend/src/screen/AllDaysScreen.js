@@ -1,39 +1,41 @@
-import React from 'react';
+import React, { useState,useEffect } from 'react';
 import {Dimensions, Pressable, View} from 'react-native';
 import {Text} from 'react-native-paper';
 import {
   getDateInDDMMYY,
-  getDatesBetween,
-  getWeekStartAndEnd,
-  reverseString,
 } from '../utils/generateFunctions';
+import { getAllDayApi } from '../service/api';
 
-const AllDaysScreen = ({navigation: {navigate}}) => {
-  const getDayOfWeek = () => {
-    const currentDate = new Date();
-    return (currentDate.getDay() + 6) % 7;
-  };
-  const dayOfWeek = getDayOfWeek();
+const AllDaysScreen = ({route,navigation: {navigate}}) => {
+  const {startMonth,endMonth,monthId,yearId} = route.params;
+  const [dayList,setDayList] = useState([]);
+  const dayOfWeek = 2;
 
-  const {startOfWeek, endOfWeek} = getWeekStartAndEnd();
-  const start = getDateInDDMMYY(startOfWeek);
-  const end = getDateInDDMMYY(endOfWeek);
+  const start = getDateInDDMMYY(new Date(startMonth));
+  const end = getDateInDDMMYY(new Date(endMonth));
+
+  useEffect(()=>{
+    const fetchAllDayData = async()=>{
+      try{
+        const queryData = {
+          startDate: startMonth,
+          endDate: endMonth,
+          monthId,
+          yearId
+        }
+       const res = await getAllDayApi({queryData});
+       setDayList(res.data.data);
+      }catch(error){
+        Alert.alert('Error',error.message);
+      }
+    }
+    fetchAllDayData();
+  },[]);
 
   const {height, width} = Dimensions.get('window');
   const hp = height / 100;
   const wp = width / 100;
 
-  const dates = getDatesBetween(startOfWeek, endOfWeek);
-  const days = [
-    {day: 'Mon', color: '#FF5733'},
-    {day: 'Tue', color: '#33FF57'},
-    {day: 'Wed', color: '#3357FF'},
-    {day: 'Thu', color: '#FF33A1'},
-    {day: 'Fri', color: '#33FFA1'},
-    {day: 'Sat', color: '#A133FF'},
-    {day: 'Sun', color: '#FFA133'},
-  ];
-  const dayAndDate = days.map((day, index) => ({...day, date: dates[index]}));
   return (
     <View
       style={{
@@ -57,9 +59,10 @@ const AllDaysScreen = ({navigation: {navigate}}) => {
 
       {/* all days of week */}
       <View style={{display: 'flex', flexWrap: 'wrap', flexDirection: 'row'}}>
-        {dayAndDate.map((item, index) => (
+        {/* <Text>{JSON.stringify(dayList)}</Text> */}
+        {dayList && dayList.map((item, index) => (
           <Pressable
-            onPress={()=>{navigate('dayReview')}}
+            onPress={()=>{navigate('dayReview',{dayId: item._id,monthId,yearId,date:item.date,day: item.day})}}
             style={{
               width: '45%',
               backgroundColor: dayOfWeek > index ? 'gray' : item.color,
@@ -73,7 +76,7 @@ const AllDaysScreen = ({navigation: {navigate}}) => {
             }}
             key={index}>
             <Text style={{fontSize: 22, fontWeight: 'bold'}}>{item.day}</Text>
-            <Text style={{fontWeight: 'bold'}}>{item.date}</Text>
+            <Text style={{fontWeight: 'bold'}}>{item.formatDate}</Text>
             <View
               style={{
                 marginVertical: 5,

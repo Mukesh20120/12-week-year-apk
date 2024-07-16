@@ -31,3 +31,19 @@ export const createMonthGoalApi = ({newData}) => {
 export const deleteMonthGoalApi = ({goalId}) => {
     return api.delete(`/month/goal?goalId=${goalId}`);
 }
+//days api
+export const getAllDayApi = ({queryData}) =>{
+    return api.get('/day',{params: queryData});
+}
+export const getDayGoalApi = ({queryData}) =>{
+    return api.get(`/day/goal`,{params: queryData});
+}
+export const updateDayGoalApi = ({updateData}) => {
+    return api.put('/day/goal',updateData);
+}
+export const createDayGoalApi = ({newData}) => {
+    return api.post('/day/goal',newData);
+}
+export const deleteDayGoalApi = ({goalId}) => {
+    return api.delete(`/day/goal?goalId=${goalId}`);
+}

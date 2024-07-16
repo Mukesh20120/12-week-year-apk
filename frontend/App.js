@@ -1,13 +1,13 @@
 import React from 'react';
-import WeekGoalScreen from './src/screen/WeekGoalScreen';
+import MonthGoalScreen from './src/screen/MonthGoalScreen';
 import 'react-native-gesture-handler';
 import {createStackNavigator} from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
-import DayReviewScreen from './src/screen/DayScreen';
 import AllDaysScreen from './src/screen/AllDaysScreen';
 import AllMonthsScreen from './src/screen/AllMonthsScreen';
 import YearGoalScreen from './src/screen/YearGoalScreen';
 import AllYearInYear from './src/screen/AllYearInYear';
+import DayGoalScreen from './src/screen/DayGoalScreen';
 
 const Stack = createStackNavigator();
 
@@ -33,7 +33,7 @@ const App = () => {
         />
         <Stack.Screen
           name="weeklyGoal"
-          component={WeekGoalScreen}
+          component={MonthGoalScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen
@@ -43,7 +43,7 @@ const App = () => {
         />
         <Stack.Screen
           name="dayReview"
-          component={DayReviewScreen}
+          component={DayGoalScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>
