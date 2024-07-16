@@ -30,7 +30,6 @@ const getDaysList = asyncWrapper(async (req, res) => {
         };
       }
     );
-
     await dayModel.insertMany(newMonthData);
   }
   const allMonthInYear = await dayModel.find({
@@ -42,11 +41,11 @@ const getDaysList = asyncWrapper(async (req, res) => {
 });
 
 const createDailyGoal = asyncWrapper(async (req, res) => {
-  const { dayId,yearId,monthId, task } = req.body;
+  const { dayId,yearId,monthId, task,value } = req.body;
   if (!isValidObjectId(dayId) || !isValidObjectId(yearId) || !isValidObjectId(monthId)) {
     throw new Error("Id Not valid");
   }
-  const newGoal = await GoalModel.create({ yearId, monthId, dayId, task });
+  const newGoal = await GoalModel.create({ yearId, monthId, dayId, task,value });
   res.json({
     success: true,
     message: "New goal created Successfully",
@@ -54,7 +53,7 @@ const createDailyGoal = asyncWrapper(async (req, res) => {
   });
 });
 const getCurrentDayGoals = asyncWrapper(async (req, res) => {
-  const { dayId } = req.query;
+  const { dayId,yearId,monthId } = req.query;
   if (!isValidObjectId(dayId)) {
     throw new Error("Id Not valid");
   }

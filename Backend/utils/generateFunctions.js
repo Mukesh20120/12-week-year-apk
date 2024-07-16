@@ -61,7 +61,7 @@ function getDatesBetween(startDate, endDate) {
     });
     dates.push({
       blockNumber: idx + 1,
-      date: currentDate,
+      date: new Date(currentDate),
       formatDate: dateInDdmmyy,
       day: dayName,
       color: colors[idx++],
@@ -71,7 +71,7 @@ function getDatesBetween(startDate, endDate) {
   return dates;
 }
 function getAllYear() {
-  const currentYear = new Date().getFullYear();
+  let currentYear = new Date().getFullYear();
   let startDate = new Date(currentYear, 0, 1); // January 1st of the current year
   const result = [];
 
@@ -84,23 +84,23 @@ function getAllYear() {
   }
 
   for (let i = 0; i < 4; i++) {
-    const setStart = new Date(startDate);
+    let setStart = new Date(startDate);
 
     // Move to the end of the 12th week
-    const setEnd = new Date(setStart);
+    let setEnd = new Date(setStart);
     setEnd.setDate(setEnd.getDate() + (12 * 7 - 1)); // 12 weeks * 7 days/week - 1 day
 
     // Break week
-    const breakWeekStart = new Date(setEnd);
+    let breakWeekStart = new Date(setEnd);
     breakWeekStart.setDate(breakWeekStart.getDate() + 1); // The day after the end of the 12th week
-    const breakWeekEnd = new Date(breakWeekStart);
+    let breakWeekEnd = new Date(breakWeekStart);
     breakWeekEnd.setDate(breakWeekEnd.getDate() + 6); // One week later
 
     result.push({
       blockNumber: i + 1,
       type: "year",
-      startDate: setStart,
-      endDate: setEnd,
+      startDate: new Date(setStart),
+      endDate: new Date(setEnd),
       formatStartDate: getDateInDDMMYY(setStart),
       formatEndDate: getDateInDDMMYY(setEnd),
       color: colors[i],
@@ -109,8 +109,8 @@ function getAllYear() {
     result.push({
       blockNumber: 0,
       type: "break",
-      startDate: breakWeekStart,
-      endDate: breakWeekEnd,
+      startDate: new Date(breakWeekStart),
+      endDate: new Date(breakWeekEnd),
       formatStartDate: getDateInDDMMYY(breakWeekStart),
       formatEndDate: getDateInDDMMYY(breakWeekEnd),
       color: colors[6],
@@ -124,7 +124,7 @@ function getAllYear() {
   return result;
 }
 function generate12Weeks(start) {
-  const current = new Date(start);
+  let current = new Date(start);
   const year = current.getFullYear();
   const result = [];
   // Adjust start date to the nearest preceding Monday
@@ -135,15 +135,15 @@ function generate12Weeks(start) {
   }
 
   for (let i = 0; i < 12; i++) {
-    const newStart = new Date(current); // Store the current start date
+    let newStart = new Date(current); // Store the current start date
     current.setDate(current.getDate() + 6); // Move to the end of the week
 
     result.push({
       blockNumber: i + 1,
       type: "month",
       year,
-      startDate: newStart,
-      endDate: current,
+      startDate: new Date(newStart),
+      endDate: new Date(current),
       formatStartDate: getDateInDDMMYY(newStart),
       formatEndDate: getDateInDDMMYY(current),
       color: colors[i],

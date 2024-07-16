@@ -9,7 +9,7 @@ const DaySchema = mongoose.Schema({
         ref: 'yearsInYear'
     },
     date: {type: Date,require: true},
-    dateName: {type: String},
+    day: {type: String},
     formatDate: {type: String},
     color: {type: String},
 });
