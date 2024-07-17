@@ -1,5 +1,9 @@
 import {configureStore} from '@reduxjs/toolkit'
+import dataSliceReducer from './redux'
+const store = configureStore({
+   reducer: {
+      timeData: dataSliceReducer
+   }
+});
 
-export const store = configureStore({
-   reducer: {}
-})
+export default store;

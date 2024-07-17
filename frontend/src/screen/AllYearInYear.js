@@ -1,25 +1,34 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Alert, Dimensions, Pressable, ScrollView, View} from 'react-native';
 import {Text} from 'react-native-paper';
-import {generate12Weeks, getAllYear} from '../utils/generateFunctions';
 import ScreenWrapper from '../component/ScreenWrapper';
-import axios from 'axios';
-import { getAllYearApi } from '../service/api';
+import {getAllYearApi} from '../service/api';
+import {useDispatch, useSelector} from 'react-redux';
+import {addYearData} from '../store/redux';
 
 const AllYearInYear = ({navigation: {navigate}}) => {
-  const [allYears, setAllYears] = useState([]);
+  const fetchYearData =
+    useSelector(state => state?.timeData?.timeLineData?.['2024']) ?? [];
+  const [allYears, setAllYears] = useState(fetchYearData);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res =await getAllYearApi();
-        setAllYears(res.data.data);
+        if (fetchYearData && fetchYearData.length > 0) {
+          setAllYears(fetchYearData);
+        } else {
+          const res = await getAllYearApi();
+          setAllYears(res.data.data);
+          dispatch(addYearData({fetchYear: '2024', yearData: res.data.data}));
+        }
       } catch (error) {
-        Alert.alert('Error',error.message);
+        Alert.alert('Error', error.message);
       }
     };
     fetchData();
   }, []);
-  // const allYears = getAllYear();
+ 
   const start = allYears?.[0]?.formatStartDate ?? '00-00-0000';
   const end = allYears?.[allYears.length - 1]?.formatEndDate ?? '00-00-0000';
   const current = new Date();
@@ -42,6 +51,7 @@ const AllYearInYear = ({navigation: {navigate}}) => {
         </Text>
       </View>
       {/* <Text>{JSON.stringify(allYears)}</Text> */}
+      <Text>{JSON.stringify(fetchYearData)}</Text>
       {/* all month of year */}
       <ScrollView>
         <View

@@ -8,11 +8,14 @@ import AllMonthsScreen from './src/screen/AllMonthsScreen';
 import YearGoalScreen from './src/screen/YearGoalScreen';
 import AllYearInYear from './src/screen/AllYearInYear';
 import DayGoalScreen from './src/screen/DayGoalScreen';
+import { Provider } from 'react-redux';
+import store from './src/store/store';
 
 const Stack = createStackNavigator();
 
 const App = () => {
   return (
+    <Provider store={store}>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="allYear">
         <Stack.Screen
@@ -48,6 +51,7 @@ const App = () => {
         />
       </Stack.Navigator>
     </NavigationContainer>
+    </Provider>
   );
 };
 
