@@ -10,7 +10,6 @@ const {
 } = require("./middleware");
 
 //router
-const todoRouter = require("./routers/todoRouter");
 const yearRouter = require('./routers/yearRouter');
 const monthRouter = require('./routers/monthRouter');
 const dayRouter = require('./routers/dayRouter');
@@ -23,7 +22,6 @@ app.use(morgan('combined'));
 
 const port = 5000;
 
-app.use("/api/v1/todo", todoRouter);
 app.use("/api/v1/year", yearRouter);
 app.use("/api/v1/month", monthRouter);
 app.use("/api/v1/day", dayRouter);
