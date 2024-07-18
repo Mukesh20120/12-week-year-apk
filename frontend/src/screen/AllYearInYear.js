@@ -4,7 +4,7 @@ import {Text} from 'react-native-paper';
 import ScreenWrapper from '../component/ScreenWrapper';
 import {getAllYearApi} from '../service/api';
 import {useDispatch, useSelector} from 'react-redux';
-import {addYearData} from '../store/redux';
+import {addIdData} from '../store/redux';
 
 const AllYearInYear = ({navigation: {navigate}}) => {
   const fetchYearData =
@@ -20,7 +20,7 @@ const AllYearInYear = ({navigation: {navigate}}) => {
         } else {
           const res = await getAllYearApi();
           setAllYears(res.data.data);
-          dispatch(addYearData({fetchYear: '2024', yearData: res.data.data}));
+          dispatch(addIdData({id: '2024', data: res.data.data}));
         }
       } catch (error) {
         Alert.alert('Error', error.message);
@@ -50,8 +50,7 @@ const AllYearInYear = ({navigation: {navigate}}) => {
           This Year scores
         </Text>
       </View>
-      {/* <Text>{JSON.stringify(allYears)}</Text> */}
-      <Text>{JSON.stringify(fetchYearData)}</Text>
+
       {/* all month of year */}
       <ScrollView>
         <View

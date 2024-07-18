@@ -1,29 +1,39 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Alert, Dimensions, Pressable, ScrollView, View} from 'react-native';
 import {Text} from 'react-native-paper';
-import {
-  generate12Weeks,
-} from '../utils/generateFunctions';
 import { getAllMonthApi } from '../service/api';
+import { addIdData } from '../store/redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const AllMonthsScreen = ({route,navigation: {navigate}}) => {
-  const [allMonthsData,setAllMonthsData] = useState([]);
   const {startMonth='2024-04-29',yearId} = route.params
+
+  const searchKey = startMonth+"#"+yearId;
+  const fetchMonthData = useSelector(state => state?.timeData?.timeLineData?.[searchKey]) ?? [];
+  const dispatch = useDispatch();
+
+  const [allMonthsData,setAllMonthsData] = useState([]);
   useEffect(()=>{
     const fetchAllMonthData = async()=>{
       try{
+        if (fetchMonthData && fetchMonthData.length > 0) {
+          setAllMonthsData(fetchMonthData);
+        } else {
         const queryData = {
           startDate: startMonth,
           yearId
         }
        const res = await getAllMonthApi({queryData});
        setAllMonthsData(res.data.data);
+       dispatch(addIdData({id: searchKey, data: res.data.data}));
+      }
       }catch(error){
         Alert.alert('Error',error.message);
       }
     }
     fetchAllMonthData();
   },[]);
+
   const start = allMonthsData?.[0]?.formatStartDate??new Date();
   const end = allMonthsData?.[11]?.formatEndDate ?? new Date();
 
@@ -50,7 +60,6 @@ const AllMonthsScreen = ({route,navigation: {navigate}}) => {
           This Year scores
         </Text>
       </View>
-      {/* <Text>{JSON.stringify(allMonthsData)}</Text> */}
       {/* all month of year */}
       <ScrollView>
         <View
