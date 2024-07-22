@@ -1,24 +1,23 @@
 import {createSlice} from '@reduxjs/toolkit'
 
 const initialState = {
-    timeLineData: {}
+    timeLineData: {},
 }
 
 const dataSlice = createSlice({
     name: 'timeLine',
     initialState,
     reducers: {
-        addYearData: (state,action)=>{
-            const {fetchYear,yearData} = action.payload;
-            state.timeLineData[fetchYear] = yearData;
+        addIdData: (state,action)=>{
+            const {id,data} = action.payload;
+            state.timeLineData[id] = data;
         },
-        getYearData: (state,action)=>{
-            const {fetchYear} = action.payload;
-            const yearData = state.allData[fetchYear];
-            return yearData?yearData:[];
+        addLocalUrl: (state,action)=>{
+            const {url} = action.payload;
+            state.timeLineData['url'] = url;
         }
     }
 })
 
-export const {addYearData,getYearData} = dataSlice.actions;
+export const {addIdData,addLocalUrl} = dataSlice.actions;
 export default dataSlice.reducer

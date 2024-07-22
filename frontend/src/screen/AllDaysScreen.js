@@ -2,9 +2,9 @@ import React, {useState, useEffect} from 'react';
 import {Dimensions, Pressable, View} from 'react-native';
 import {Text} from 'react-native-paper';
 import {getDateInDDMMYY} from '../utils/generateFunctions';
-import {getAllDayApi} from '../service/api';
 import { addIdData } from '../store/redux';
 import { useDispatch, useSelector } from 'react-redux';
+import { createApiInstance } from '../service';
 
 const AllDaysScreen = ({route, navigation: {navigate}}) => {
   const {startMonth, endMonth, monthId, yearId} = route.params;
@@ -18,7 +18,7 @@ const AllDaysScreen = ({route, navigation: {navigate}}) => {
 
   const start = getDateInDDMMYY(new Date(startMonth));
   const end = getDateInDDMMYY(new Date(endMonth));
-
+  const api = createApiInstance();
   useEffect(() => {
     const fetchAllDayData = async () => {
       try {
@@ -31,7 +31,7 @@ const AllDaysScreen = ({route, navigation: {navigate}}) => {
             monthId,
             yearId,
           };
-          const res = await getAllDayApi({queryData});
+          const res = await api.get('/day',{params: queryData});
           setDayList(res.data.data);
           dispatch(addIdData({id: searchKey, data: res.data.data}));
         }

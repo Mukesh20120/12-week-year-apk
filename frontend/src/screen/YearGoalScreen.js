@@ -1,13 +1,13 @@
-import {Keyboard, View, Alert} from 'react-native';
+import {View, Alert} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {Text, Button} from 'react-native-paper';
 import { getDateInDDMMYY} from '../utils/generateFunctions';
 import RenderList from '../component/RenderList';
 import MonthIcon from '../component/MonthIcon';
 import ScreenWrapper from '../component/ScreenWrapper';
-import axios from 'axios';
 import InputBox from '../component/InputBox';
-import { createYearGoalApi, deleteYearGoalApi, getYearGoalApi, updateYearGoalApi } from '../service/api';
+import { createApiInstance } from '../service';
+
 
 const YearGoalScreen = ({route, navigation: {navigate}}) => {
   const {
@@ -23,10 +23,11 @@ const YearGoalScreen = ({route, navigation: {navigate}}) => {
   const [updateId,setUpdateId] = useState(null);
   const [text,setText] = useState('');
   const [priority,setPriority] = useState(0);
+  const api = createApiInstance();
 
   const getGoalData = async () => {
     try {
-      const res = await getYearGoalApi({yearId});
+      const res = await api.get(`/year/goal?yearId=${yearId}`);
       setTaskList(res.data.allGoal);
     } catch (error) {
       Alert.alert('Error', 'Not able to fetch the year goal list');
@@ -47,7 +48,7 @@ const YearGoalScreen = ({route, navigation: {navigate}}) => {
               task: inputText,
               value,
             };
-            const res = await updateYearGoalApi({updateData: newTask});
+            const res = await api.put('/year/goal',newTask);
             // Alert.alert('success', res.data.message);
           } else {
             const newTask = {
@@ -55,7 +56,7 @@ const YearGoalScreen = ({route, navigation: {navigate}}) => {
               task: inputText,
               value,
             };
-            const res = await createYearGoalApi({newData: newTask});
+            const res = await api.post('/year/goal',newTask);
             // Alert.alert('success', res.data.message);
           }
         } catch (error) {
@@ -77,7 +78,7 @@ const YearGoalScreen = ({route, navigation: {navigate}}) => {
         goalId: id,
         done
        }
-        await updateYearGoalApi({updateData: newData});
+       await api.put('/year/goal',newData);
         getGoalData();
       }catch(error){
         Alert.alert('Error',error.message);
@@ -101,7 +102,7 @@ const YearGoalScreen = ({route, navigation: {navigate}}) => {
           text: 'ok',
           onPress: async() => {
             try{
-              await deleteYearGoalApi({goalId: id});
+              await api.delete(`/year/goal?goalId=${id}`);
               getGoalData();
             }catch(error){
                Alert.alert('Error',error.message);

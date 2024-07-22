@@ -10,6 +10,7 @@ import AllYearInYear from './src/screen/AllYearInYear';
 import DayGoalScreen from './src/screen/DayGoalScreen';
 import { Provider } from 'react-redux';
 import store from './src/store/store';
+import AddUrlScreen from './src/screen/AddUrlScreen';
 
 const Stack = createStackNavigator();
 
@@ -17,7 +18,12 @@ const App = () => {
   return (
     <Provider store={store}>
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="allYear">
+      <Stack.Navigator initialRouteName="addUrl">
+        <Stack.Screen
+          name="addUrl"
+          component={AddUrlScreen}
+          options={{headerShown: false}}
+        />
         <Stack.Screen
           name="allYear"
           component={AllYearInYear}

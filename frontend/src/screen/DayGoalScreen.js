@@ -1,11 +1,10 @@
-import {Alert, Keyboard, View} from 'react-native';
+import {Alert, View} from 'react-native';
 import React, {useState,useEffect,useCallback} from 'react';
-import {Text, Button, TextInput} from 'react-native-paper';
-import {generateId, getDateInDDMMYY} from '../utils/generateFunctions';
+import {Text} from 'react-native-paper';
+import {getDateInDDMMYY} from '../utils/generateFunctions';
 import RenderList from '../component/RenderList';
-import Slider from '@react-native-community/slider';
 import InputBox from '../component/InputBox';
-import { createDayGoalApi, deleteDayGoalApi, getDayGoalApi, updateDayGoalApi } from '../service/api';
+import { createApiInstance } from '../service';
 
 
 const DayGoalScreen = ({route}) => {
@@ -17,6 +16,7 @@ const DayGoalScreen = ({route}) => {
   const [updateId, setUpdateId] = useState(null);
   const [text, setText] = useState('');
   const [priority, setPriority] = useState(0);
+  const api = createApiInstance();
 
   const getGoalData = async () => {
     try {
@@ -25,7 +25,7 @@ const DayGoalScreen = ({route}) => {
         yearId,
         dayId
       };
-      const res = await getDayGoalApi({queryData});
+      const res = await api.get(`/day/goal`,{params: queryData});
       setTaskList(res.data.allGoal);
     } catch (error) {
       Alert.alert('Error', error.message);
@@ -45,7 +45,7 @@ const DayGoalScreen = ({route}) => {
             task: inputText,
             value,
           };
-          const res = await updateDayGoalApi({updateData: newTask});
+          const res = await api.put('/day/goal',newTask);
         } else {
           const newTask = {
             yearId,
@@ -54,7 +54,7 @@ const DayGoalScreen = ({route}) => {
             task: inputText,
             value,
           };
-          const res = await createDayGoalApi({newData: newTask});
+          const res = await api.post('/day/goal',newTask);
         }
       } catch (error) {
         Alert.alert('Error', error.message);
@@ -74,7 +74,7 @@ const DayGoalScreen = ({route}) => {
         goalId: id,
         done,
       };
-      await updateDayGoalApi({updateData: newData});
+      await await api.put('/day/goal',newTask);
       getGoalData();
     } catch (error) {
       Alert.alert('Error', error.message);
@@ -98,7 +98,7 @@ const DayGoalScreen = ({route}) => {
           text: 'ok',
           onPress: async () => {
             try {
-              await deleteDayGoalApi({goalId: id});
+              await api.delete(`/day/goal?goalId=${id}`);
               getGoalData();
             } catch (error) {
               Alert.alert('Error', error.message);

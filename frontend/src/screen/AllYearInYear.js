@@ -5,11 +5,14 @@ import ScreenWrapper from '../component/ScreenWrapper';
 import {getAllYearApi} from '../service/api';
 import {useDispatch, useSelector} from 'react-redux';
 import {addIdData} from '../store/redux';
+import axios from 'axios';
+import { createApiInstance } from '../service';
 
 const AllYearInYear = ({navigation: {navigate}}) => {
   const fetchYearData =
     useSelector(state => state?.timeData?.timeLineData?.['2024']) ?? [];
   const [allYears, setAllYears] = useState(fetchYearData);
+  const api = createApiInstance();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -18,7 +21,7 @@ const AllYearInYear = ({navigation: {navigate}}) => {
         if (fetchYearData && fetchYearData.length > 0) {
           setAllYears(fetchYearData);
         } else {
-          const res = await getAllYearApi();
+          const res = await api.get('/year');
           setAllYears(res.data.data);
           dispatch(addIdData({id: '2024', data: res.data.data}));
         }

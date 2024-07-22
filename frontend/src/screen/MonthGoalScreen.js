@@ -1,22 +1,13 @@
-import {Keyboard, View, Alert} from 'react-native';
+import { View, Alert} from 'react-native';
 import React, {useCallback, useEffect, useState} from 'react';
-import {Text, Button, TextInput} from 'react-native-paper';
+import {Text, Button} from 'react-native-paper';
 import {
-  generateId,
-  getWeekStartAndEnd,
   getDateInDDMMYY,
 } from '../utils/generateFunctions';
 import WeekIcon from '../component/WeekIcon';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import RenderList from '../component/RenderList';
-import Slider from '@react-native-community/slider';
-import {
-  createMonthGoalApi,
-  deleteMonthGoalApi,
-  getMonthGoalApi,
-  updateMonthGoalApi,
-} from '../service/api';
 import InputBox from '../component/InputBox';
+import { createApiInstance } from '../service';
 
 const MonthGoalScreen = ({route, navigation: {navigate}}) => {
   const {monthId, yearId, startMonth, endMonth} = route.params;
@@ -31,14 +22,15 @@ const MonthGoalScreen = ({route, navigation: {navigate}}) => {
   const [updateId, setUpdateId] = useState(null);
   const [text, setText] = useState('');
   const [priority, setPriority] = useState(0);
-
+  const api = createApiInstance();
+  
   const getGoalData = async () => {
     try {
       const queryData = {
         monthId,
         yearId,
       };
-      const res = await getMonthGoalApi({queryData});
+      const res = await api.get(`/month/goal`,{params: queryData});
       setTaskList(res.data.allGoal);
     } catch (error) {
       Alert.alert('Error', 'Not able to fetch the year goal list');
@@ -58,7 +50,7 @@ const MonthGoalScreen = ({route, navigation: {navigate}}) => {
             task: inputText,
             value,
           };
-          const res = await updateMonthGoalApi({updateData: newTask});
+          const res = await api.put('/month/goal',newTask);
         } else {
           const newTask = {
             yearId,
@@ -66,7 +58,7 @@ const MonthGoalScreen = ({route, navigation: {navigate}}) => {
             task: inputText,
             value,
           };
-          const res = await createMonthGoalApi({newData: newTask});
+          const res = await api.post('/month/goal',newTask);
         }
       } catch (error) {
         Alert.alert('Error', error.message);
@@ -86,7 +78,7 @@ const MonthGoalScreen = ({route, navigation: {navigate}}) => {
         goalId: id,
         done,
       };
-      await updateMonthGoalApi({updateData: newData});
+      await api.put('/month/goal',newData);
       getGoalData();
     } catch (error) {
       Alert.alert('Error', error.message);
@@ -110,7 +102,7 @@ const MonthGoalScreen = ({route, navigation: {navigate}}) => {
           text: 'ok',
           onPress: async () => {
             try {
-              await deleteMonthGoalApi({goalId: id});
+              await api.delete(`/month/goal?goalId=${id}`);
               getGoalData();
             } catch (error) {
               Alert.alert('Error', error.message);
