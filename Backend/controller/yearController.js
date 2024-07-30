@@ -54,20 +54,23 @@ const getYearList = asyncWrapper(async (req, res) => {
 });
 
 const createNewYearlyGoal = asyncWrapper(async(req,res)=>{
+  const {id: userId} = req.decode;
   const {yearId,task,value} = req.body;
   if(!yearId || !mongoose.isValidObjectId(yearId)){
     throw new Error('Year Id Not found')
   }
-  const newGoal = await GoalModel.create({yearId,task,value});
+  const newGoal = await GoalModel.create({yearId,userId,task,value});
   res.json({success: true,message: 'New goal created Successfully',newGoal});
 })
 const getAllYearlyGoal = asyncWrapper(async(req,res)=>{
+  const {id: userId} = req.decode;
   const {yearId} = req.query;
   if(!yearId || !mongoose.isValidObjectId(yearId)){
     throw new Error('Year Id Not found')
   }
   const allGoal = await GoalModel.find({
     yearId: { $eq: yearId, $exists: true },
+    userId: { $eq: userId, $exists: true },
     monthId: { $exists: false }
   }).sort({value: -1});
   res.json({success: true,message: 'list of goal fetch Successfully',allGoal});

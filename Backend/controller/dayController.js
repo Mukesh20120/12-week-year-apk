@@ -41,11 +41,12 @@ const getDaysList = asyncWrapper(async (req, res) => {
 });
 
 const createDailyGoal = asyncWrapper(async (req, res) => {
+  const {id: userId} = req.decode;
   const { dayId,yearId,monthId, task,value } = req.body;
   if (!isValidObjectId(dayId) || !isValidObjectId(yearId) || !isValidObjectId(monthId)) {
     throw new Error("Id Not valid");
   }
-  const newGoal = await GoalModel.create({ yearId, monthId, dayId, task,value });
+  const newGoal = await GoalModel.create({ yearId, monthId, dayId, task,value,userId });
   res.json({
     success: true,
     message: "New goal created Successfully",
@@ -53,6 +54,7 @@ const createDailyGoal = asyncWrapper(async (req, res) => {
   });
 });
 const getCurrentDayGoals = asyncWrapper(async (req, res) => {
+  const {id: userId} = req.decode;
   const { dayId,yearId,monthId } = req.query;
   if (!isValidObjectId(dayId)) {
     throw new Error("Id Not valid");
@@ -61,6 +63,7 @@ const getCurrentDayGoals = asyncWrapper(async (req, res) => {
     dayId: { $eq: dayId, $exists: true },
     monthId: { $eq: monthId, $exists: true },
     yearId: { $eq: yearId, $exists: true },
+    userId: { $eq: userId, $exists: true },
   });
   res.json({
     success: true,

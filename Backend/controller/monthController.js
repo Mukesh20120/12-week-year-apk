@@ -53,11 +53,12 @@ const getMonthList = asyncWrapper(async (req, res) => {
 });
 
 const createNewMonthlyGoal = asyncWrapper(async (req, res) => {
+  const {id: userId} = req.decode;
   const { yearId, monthId, task,value } = req.body;
   if (!isValidObjectId(yearId) || !isValidObjectId(monthId)) {
     throw new Error("Id Not valid");
   }
-  const newGoal = await GoalModel.create({ yearId, monthId, task,value});
+  const newGoal = await GoalModel.create({ yearId, monthId,userId, task,value});
   res.json({
     success: true,
     message: "New goal created Successfully",
@@ -65,13 +66,15 @@ const createNewMonthlyGoal = asyncWrapper(async (req, res) => {
   });
 });
 const getAllMonthlyGoal = asyncWrapper(async (req, res) => {
+  const {id: userId} = req.decode;
   const { yearId, monthId } = req.query;
   if (!isValidObjectId(yearId) || !isValidObjectId(monthId)) {
     throw new Error("Id Not valid");
   }
   const allGoal = await GoalModel.find({
     yearId: { $eq: yearId, $exists: true },
-    monthId: { $eq: monthId, $exists: true }
+    monthId: { $eq: monthId, $exists: true },
+    userId: { $eq: userId, $exists: true },
   }).sort({value: -1});
   res.json({
     success: true,

@@ -28,6 +28,10 @@ const goalSchema = mongoose.Schema(
     dayId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'daysOfWeek'
+    },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
   },
   {
