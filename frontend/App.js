@@ -11,6 +11,8 @@ import DayGoalScreen from './src/screen/DayGoalScreen';
 import { Provider } from 'react-redux';
 import store from './src/store/store';
 import AddUrlScreen from './src/screen/AddUrlScreen';
+import SignIn from './src/screen/SignIn';
+import Register from './src/screen/Register';
 
 const Stack = createStackNavigator();
 
@@ -19,6 +21,16 @@ const App = () => {
     <Provider store={store}>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="addUrl">
+        <Stack.Screen
+          name="login"
+          component={SignIn}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="register"
+          component={Register}
+          options={{headerShown: false}}
+        />
         <Stack.Screen
           name="addUrl"
           component={AddUrlScreen}

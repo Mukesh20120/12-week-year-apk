@@ -15,9 +15,13 @@ const dataSlice = createSlice({
         addLocalUrl: (state,action)=>{
             const {url} = action.payload;
             state.timeLineData['url'] = url;
+        },
+        addToken: (state,action)=>{
+            const {token} = action.payload;
+            state.timeLineData['token'] = token;
         }
     }
 })
 
-export const {addIdData,addLocalUrl} = dataSlice.actions;
+export const {addIdData,addLocalUrl,addToken} = dataSlice.actions;
 export default dataSlice.reducer

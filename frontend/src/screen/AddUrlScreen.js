@@ -7,13 +7,13 @@ import { useDispatch } from 'react-redux';
 import { addLocalUrl } from '../store/redux';
 
 const AddUrlScreen = ({navigation: {navigate}}) => {
-  const [url, setUrl] = useState('http://192.168.1.4:5000/api/v1');
+  const [url, setUrl] = useState('http://192.168.117.181:5000/api/v1');
   const dispatch = useDispatch();
 
   const handleSubmitButton = () => {
       dispatch(addLocalUrl({url}));
       setUrl('');
-      navigate('allYear')
+      navigate('login')
   }
   return (
     <ScreenWrapper>
