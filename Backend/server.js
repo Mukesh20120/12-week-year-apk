@@ -13,6 +13,7 @@ const {
 const yearRouter = require('./routers/yearRouter');
 const monthRouter = require('./routers/monthRouter');
 const dayRouter = require('./routers/dayRouter');
+const authRouter = require('./routers/authRouter');
 
 const app = express();
 
@@ -25,6 +26,7 @@ const port = 5000;
 app.use("/api/v1/year", yearRouter);
 app.use("/api/v1/month", monthRouter);
 app.use("/api/v1/day", dayRouter);
+app.use("/api/v1/auth",authRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
